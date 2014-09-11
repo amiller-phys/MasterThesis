@@ -12,17 +12,30 @@ from itertools import izip
 
 #ATTEN - Give doc strings to individual dydt functs?
 #ATTEN - Make scipy stream solutions?  Possible?
+#ATTEN - Have argparse set defaults based on system?  Probably not worthwhile.
+# COULD BE USEFUL FOR y0 for coupled systems.
+
+#ATTEN - dt isn't set quite right (numpy thingy).  Works when t and dt divide.
+
+#ATTEN - add header options for output.
 
 def main():
 	"""
-	Doc String
+	Prases options from the command line, sets the derivative function dydt
+	for the system secified in the command line, and then solves the ODE.
+	Results are printed to stdout in csv format.
 	"""
 
-	options = parse_arguments()
+	args = parse_arguments()
 
-	dydt = set_dydt(name = options.name, e = 0, mu = 0)
+	dydt = set_dydt(name = args.name, mu = args.mu, e = args.e, l = args.l,
+		gamma = args.gamma, M = args.M, k = args.k, c = args.c, m = args.m,
+		epsilon = args.epsilon, g = args.g)
 
-	solve_ODE(dydt = dydt, y0 = [pi/2-.1,0], method = 'rk4')
+	if(args.header): print_header(name = args.name)
+
+	solve_ODE(dydt = dydt, time = args.time, dt = args.dt, y0 = args.y0, 
+		method = args.method)
 
 
 def parse_arguments():
@@ -32,12 +45,51 @@ def parse_arguments():
 
 	parser.add_argument('--name', '-n', type=str, default='spring',
 		help = '''Name of system to simulate.  Can choose from: 'spring',
-		'pendulum', 'clock', 'coupled_clocks', and 'coupled_driven_clocks'.''')
+		'pendulum', 'clock', 'coupled_clocks', and 'coupled_driven_clocks'.
+		Defaults to 'spring'.''')
+	parser.add_argument('--header', action='store_true',
+		help = '''Prints header if this is specified (default False)''')
+
+	#Simulation Parameters
+	parser.add_argument('--time', '-t', type=float, default=100,
+		help = "Number of seconds simulated (default 100).")
+	parser.add_argument('--dt', type=float, default = 0.05,
+		help = "Step size used in simulation (default 0.05).")
+	parser.add_argument('--method', type=str, default='scipy',
+		help = '''Sepcify either 'rk4' to use a fourth-order Runge-Kutta
+		method or 'scipy' to use odeint in scipy (default).''')
+	parser.add_argument('--y0', '-y', type=float, nargs='+', default = [3,0],
+		help = '''Sepcifies the list of initial conditions.  Defaults to
+		[3,0], which only works with systems of 2 degrees of freedom (the 
+		non coupled systems).  The coupled systems have 6 degrees of freedom,
+		which requires a list of length 6 (i.e. [0,0,1.3,0,1.1,0]).''')
+
+	#System Parameters
+	parser.add_argument('--mu', '-u', type=float, default = 0,
+		help='Damping parameter (defaults to 0)')
+	parser.add_argument('-e', type=float, default = 1.13,
+		help='Strength of escapment (defaults 1.13)')
+	parser.add_argument('--gamma', type=float, default = 0.012,
+		help='Critical angle of escapment (default 0.012)')
+	parser.add_argument('-l', type=float, default = 1.0,
+		help='Length of pendulum')
+	parser.add_argument('-M', type=float, default = 5,
+		help='Mass of common support')
+	parser.add_argument('-k', type=float,default = 0.1,
+		help='Spring constant (default 0.1)')
+	parser.add_argument('-c', type=float, default=1,
+		help='Damping parameter for common support')
+	parser.add_argument('-m', type=float, default=0.1,
+		help='Mass of pendulum point mass (default 0.1)')
+	parser.add_argument('--epsilon', type=float, default=0,
+		help='Strength of driving force (default 0)')
+	parser.add_argument('-g', default=9.81,
+		help='Acceleration of gravity (default 9.81)')
 
 	return parser.parse_args()
 
 def set_dydt(name, mu = 7, e = 1.13, gamma = 0.12, l = 1.0, M = 5, k = 0.1, 
-			c=1, m = 0.1, epsilon = 0, g = 9.8):
+			c=1, m = 0.1, epsilon = 0, g = 9.81):
 	"""
 	Pre-condiiton: 'name' is the name of a system to simulate.  Parameters
 	for the given system can be specified (given reasonable default values).
@@ -53,7 +105,7 @@ def set_dydt(name, mu = 7, e = 1.13, gamma = 0.12, l = 1.0, M = 5, k = 0.1,
 
 	if(name == 'pendulum'):
 		def dydt(x, t):
-			return [x[1], -sin(x[0]) - mu*x[1] + e*cos(t)]
+			return [x[1], -sin(x[0]) - mu*x[1] + epsilon*cos(t)]
 
 	if(name == 'clock'):
 		def dydt(x, t):
@@ -61,7 +113,7 @@ def set_dydt(name, mu = 7, e = 1.13, gamma = 0.12, l = 1.0, M = 5, k = 0.1,
 					+ epsilon*cos(t)]
 
 	#X[i] 0=theta1,1=theta1v,2=theta2,3=theta2v,4=x,5=v
-	if(name == 'coupled_clocks'): 
+	if(name == 'cd'): 
 		def D(t,theta, thetav):
 			return e*(gamma**2 - theta**2)*thetav
 
@@ -97,25 +149,31 @@ def set_dydt(name, mu = 7, e = 1.13, gamma = 0.12, l = 1.0, M = 5, k = 0.1,
 
 	return dydt
 
-def solve_ODE(dydt, y0, method = 'scipy'):
+def print_header(name):
 	"""
+	"""
+
+	if(name == 'spring'): print('Time, Position, Velocity')
+	if(name == 'pendulum' or name == 'clock'): 
+		print('Time, Angle, Angular Velocity')
+	if(name == 'coupled_clocks' or name =='coupled_driven_clocks'): 
+		print('Time, Theta1, Theta1v, Theta2, Theta2v, Beam, BeamV')
+
+def solve_ODE(dydt, y0, time = 100.0, dt = 0.05, method = 'scipy'):
+	"""
+	Pre-condiiton: dydt is a function, dydt(x,t), where x is a list of length n
+	and t is time (n is the number of degrees of freedom).
 	"""
 
 	if(method == 'scipy'):
-		t  = numpy.linspace(0, 100., 5000)
-		soln = odeint(dydt, y0, t)
-		X = soln[:,0]
-		Y = soln[:,1]
-		if(name == 'coupled_clocks' or name == 'coupled_driven_clocks'):
-			X2 = soln[:,2]
-			Y2 = soln[:,3]
-		soln = numpy.column_stack((t,soln))
+		t  = numpy.linspace(0, time, time/dt + 1)
+		soln = numpy.column_stack((t,odeint(dydt, y0, t)))
 		numpy.savetxt(sys.stdout,soln,delimiter=',', fmt='%.15f')
 
-	elif(method == 'rk4'):
+	elif(method == 'rk4'): #ATTEN - Double check time dependence
 		position = y0
-		t  = numpy.linspace(0, 100., 5000)
-		dt = t[1]-t[0]
+		t  = numpy.linspace(dt, time, time/dt)
+		print(0,str(position).strip('[]'),sep=',')
 
 		for i in t:
 			k1 = dydt(position,i)
