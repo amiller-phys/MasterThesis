@@ -12,10 +12,10 @@ None (just argparse)
 
 System parameters 
 Damping (Mu), Drive Amp/Escapment Strength (Epsilon/e), gamma (critical angle)
--biff='Forcing' or 'Frequency' or 'Damping' (turns bifurcation on)
--biff_range = LIST (range of Forcings, Freqs, or Dampings to run)
 
 -M, k, c, m, l, g
+
+Time (duration) of simulation.
 
 ## Program Notes:
 
@@ -115,7 +115,11 @@ Use a makefile to produce all needed graphics for thesis (and thesis).
 
 ## Program Notes:
 
-* Creates bifurcation diagram, varying one parameter.
+Creates bifurcation diagram, varying one parameter.
+
+## ArgParse:
+-biff='Forcing' or 'Frequency' or 'Damping' (turns bifurcation on)
+-biff_range = LIST (range of Forcings, Freqs, or Dampings to run)
 
 ===================================================================
 
