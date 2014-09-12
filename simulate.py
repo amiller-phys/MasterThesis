@@ -28,7 +28,7 @@ def main():
 		gamma = args.gamma, M = args.M, k = args.k, c = args.c, m = args.m,
 		epsilon = args.epsilon, g = args.g)
 
-	if(args.header): print_header(name = args.name)
+	print_header(name = args.name)
 
 	solve_ODE(dydt = dydt, time = args.time, dt = args.dt, y0 = args.y0, 
 		method = args.method)
@@ -57,8 +57,6 @@ def parse_arguments():
 	parser.add_argument('--method', type=str, default='scipy',
 		help = '''Sepcify either 'rk4' to use a fourth-order Runge-Kutta
 		method or 'scipy' to use odeint in scipy (default).''')
-	parser.add_argument('--no_header', dest='header', action='store_false',
-		help = '''Prints header if this is specified (default False)''')
 	
 	#System Parameters
 	parser.add_argument('-mu', type=float, default = 0,
