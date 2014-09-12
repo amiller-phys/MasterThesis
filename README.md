@@ -1,38 +1,7 @@
 This is a list of the programs for my masters thesis, and what they intend to accomplish.
 
-===================================================================
-
-# Simulation:
-Run numeric simulation, output numeric file to stdout
-
-## Input
-None (just argparse)
-
-## ArgParse:
-
-System parameters 
-Damping (Mu), Drive Amp/Escapment Strength (Epsilon/e), gamma (critical angle)
-
--M, k, c, m, l, g
-
-Time (duration) of simulation.
-
-## Program Notes:
-
-All that changes from system to system is diff eqs.
-
-class dyn_system:
-* Functions:
-	* __init__
-	* simulate(time)
-	* derivs
-* Data:
-	* data
-	* M,k,c,m,l,g; Mu,e,gamma
-
-
-### Systems:
--Spring (SHM) (viewed as Phase Portrain, Time Series, )
+# Systems/Plots:
+-Spring (SHM) (viewed as Phase Portrain, Time Series)
 	-Damped Spring (DON'T MAKE SEPARATE THAN NON-DAMPPED)
 -Pendulum
 -Clock (also limit cycle)
@@ -41,63 +10,47 @@ class dyn_system:
 -Coupled clocks (time series, sum/diff angle)
 -Driven coupled clocks (phase portraits, limit cycle, biffurcation)
 
-## Output:
+===================================================================
 
-Time series data in csv format.
-* Header with Name of vars for plotting.  
-* Should match if multiple (x,y) pairs (?)
+# Simulation:
+Run numeric simulation, output numeric file to stdout (in csv format) 
+
+## Notes:
+
+* Add check if scipy is installed (make so can run just on built in rk4 method).
+To check it, just add /usr/bin/ to front of python2.7 in shebang line.
+
+* Double check DiffEQs to make sure correct.
+
+* Investigate other ODE methods (i.e. non-uniform time-step).
 
 ===================================================================
 
 # Transform Program:
 
 ## Input
-CSV File (time series) from stdin
-## Notes:
-
-* Sum/diff angles
-* Create Poincare Sections (subset data)
+CSV File (time series) from stdin.  Does the following transformations:
+* Sum/diff of given vars
+* Poincare Sections (subset data)
 * Limit cycle
-(Bifurcation needs to be part of simulation, nothing for here)
 
 ## Output
 CSV file, to stdout, ready for plotting.
+
+## Notes:
+* PS and LC just subset the data (horizontal slices).
+* Sum/Diff require more work, to manage the approriate columns.
+
+For poincare, must make sure that t % args.time == 0 (pick step size and time well, otherwise you'll get nothing (or little by chance)).  Check cut off.  ATTEN - Let user specifiy threshold cutt off????
 
 ===================================================================
 
 # Graphics Program:
 
-## Program Notes:
+## Notes:
 
-* Handel plotting one or two (or multiple) systems (based on input)
-* Make multiple plots based on one simulation run?  Might need to save \
-simulation to txt file.
-
-
-## Input:
-
-* csv file with header (Used to label axis).  Plots points in pairs of two, read in as (x,y).
-* need multiple header lines? (give name to each set of points,perhaps plot title)?
-Probably not - only needed in the critical damping plot, that's unique enough to make a separate program.
-
-
-## ArgParse:
-
-* Specify xlim, ylim (options with defaults)
-* Specify output image size (in pixels)
-* Type of plot (time series, phase portrait)
-* Type of graph (plot points, connected lines)
-
-Input numeric simulation (possibly with some header), output graphics
-
-Pipe program together for different resuls
-
-Use a makefile to produce all needed graphics for thesis (and thesis).
-
-# Critical Damping Program
-* Seems like a special case to make classification plot & find critical damping.
-
--Error for exact systems (separate program)
+* Figure out how to connect the dots
+* Possible to do multiple phase portrate plots?
 
 ===================================================================
 
@@ -106,7 +59,7 @@ Use a makefile to produce all needed graphics for thesis (and thesis).
 ## Program Notes:
 
 * Creates multiple plots (i.e. Phase Portraits) on the same graph (useful for creating multiple pendulum, spring phase portraits).
-* This was *not* used to create time-series for the two pendulums, as that was part of one simulation.
+* This was *not* used to create time-series for the coupled clocks, as that was part of one simulation.
 
 
 =====================================================================
@@ -118,9 +71,17 @@ Use a makefile to produce all needed graphics for thesis (and thesis).
 Creates bifurcation diagram, varying one parameter.
 
 ## ArgParse:
--biff='Forcing' or 'Frequency' or 'Damping' (turns bifurcation on)
--biff_range = LIST (range of Forcings, Freqs, or Dampings to run)
+* -biff='Forcing' or 'Frequency' or 'Damping' (turns bifurcation on)
+* -biff_range = LIST (range of Forcings, Freqs, or Dampings to run)
 
 ===================================================================
 
-# Error Analysis
+# Error Analysis (for exact systems)
+
+===================================================================
+
+# Critical Damping
+
+===================================================================
+
+# Makefile
