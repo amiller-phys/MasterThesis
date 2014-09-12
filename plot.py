@@ -31,6 +31,10 @@ def main():
 	if(args.ymax is not None): plt.ylim(ymax = args.ymax)
 	if(args.ymin is not None): plt.ylim(ymin = args.ymin)
 
+	if(args.xlab is not None): plt.xlabel(args.xlab)
+	if(args.ylab is not None): plt.ylabel(args.ylab)
+	if(args.title is not None): plt.title(args.title)
+	
 	if(args.output is None): plt.show()
 	else: plt.savefig(args.output, format='pdf')
 
