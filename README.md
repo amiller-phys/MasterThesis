@@ -1,6 +1,6 @@
 This is a list of the programs for my masters thesis, and what they intend to accomplish.
 
-# Systems/Plots:
+## Systems/Plots:
 -Spring (SHM) (viewed as Phase Portrain, Time Series)
 	-Damped Spring (DON'T MAKE SEPARATE THAN NON-DAMPPED)
 -Pendulum
@@ -12,10 +12,10 @@ This is a list of the programs for my masters thesis, and what they intend to ac
 
 ===================================================================
 
-# Simulation:
+## Simulation:
 Run numeric simulation, output numeric file to stdout (in csv format) 
 
-## Notes:
+### Notes:
 
 * Add check if scipy is installed (make so can run just on built in rk4 method).
 To check it, just add /usr/bin/ to front of python2.7 in shebang line.
@@ -26,18 +26,18 @@ To check it, just add /usr/bin/ to front of python2.7 in shebang line.
 
 ===================================================================
 
-# Transform Program:
+## Transform Program:
 
-## Input
+### Input
 CSV File (time series) from stdin.  Does the following transformations:
 * Sum/diff of given vars
 * Poincare Sections (subset data)
 * Limit cycle
 
-## Output
+### Output
 CSV file, to stdout, ready for plotting.
 
-## Notes:
+### Notes:
 * PS and LC just subset the data (horizontal slices).
 * Sum/Diff require more work, to manage the approriate columns.
 
@@ -45,18 +45,18 @@ For poincare, must make sure that t % args.time == 0 (pick step size and time we
 
 ===================================================================
 
-# Graphics Program:
+## Graphics Program:
 
-## Notes:
+### Notes:
 
 * Figure out how to connect the dots
 * Possible to do multiple phase portrate plots?
 
 ===================================================================
 
-# MultiSims Program:
+## MultiSims Program:
 
-## Program Notes:
+### Program Notes:
 
 * Creates multiple plots (i.e. Phase Portraits) on the same graph (useful for creating multiple pendulum, spring phase portraits).
 * This was *not* used to create time-series for the coupled clocks, as that was part of one simulation.
@@ -64,24 +64,24 @@ For poincare, must make sure that t % args.time == 0 (pick step size and time we
 
 =====================================================================
 
-# Bifurcatoin Program:
+## Bifurcatoin Program:
 
-## Program Notes:
+### Program Notes:
 
 Creates bifurcation diagram, varying one parameter.
 
-## ArgParse:
+### ArgParse:
 * -biff='Forcing' or 'Frequency' or 'Damping' (turns bifurcation on)
 * -biff_range = LIST (range of Forcings, Freqs, or Dampings to run)
 
 ===================================================================
 
-# Error Analysis (for exact systems)
+## Error Analysis (for exact systems)
 
 ===================================================================
 
-# Critical Damping
+## Critical Damping
 
 ===================================================================
 
-# Makefile
+## Makefile
