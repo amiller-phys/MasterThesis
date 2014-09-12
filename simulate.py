@@ -12,12 +12,8 @@ from itertools import izip
 
 #ATTEN - Give doc strings to individual dydt functs?
 #ATTEN - Make scipy stream solutions?  Possible?
-#ATTEN - Have argparse set defaults based on system?  Probably not worthwhile.
-# COULD BE USEFUL FOR y0 for coupled systems.
 
 #ATTEN - dt isn't set quite right (numpy thingy).  Works when t and dt divide.
-
-#ATTEN - add header options for output.
 
 def main():
 	"""
@@ -43,33 +39,33 @@ def parse_arguments():
 
 	parser = argparse.ArgumentParser(description = __doc__)
 
-	parser.add_argument('--name', '-n', type=str, default='spring',
+	parser.add_argument('name', type=str, default='spring',
 		help = '''Name of system to simulate.  Can choose from: 'spring',
 		'pendulum', 'clock', 'coupled_clocks', and 'coupled_driven_clocks'.
 		Defaults to 'spring'.''')
-	parser.add_argument('--header', action='store_true',
-		help = '''Prints header if this is specified (default False)''')
 
 	#Simulation Parameters
-	parser.add_argument('--time', '-t', type=float, default=100,
-		help = "Number of seconds simulated (default 100).")
-	parser.add_argument('--dt', type=float, default = 0.05,
-		help = "Step size used in simulation (default 0.05).")
-	parser.add_argument('--method', type=str, default='scipy',
-		help = '''Sepcify either 'rk4' to use a fourth-order Runge-Kutta
-		method or 'scipy' to use odeint in scipy (default).''')
 	parser.add_argument('--y0', '-y', type=float, nargs='+', default = [3,0],
 		help = '''Sepcifies the list of initial conditions.  Defaults to
 		[3,0], which only works with systems of 2 degrees of freedom (the 
 		non coupled systems).  The coupled systems have 6 degrees of freedom,
 		which requires a list of length 6 (i.e. [0,0,1.3,0,1.1,0]).''')
-
+	parser.add_argument('-dt', type=float, default = 0.05,
+		help = "Step size used in simulation (default 0.05).")
+	parser.add_argument('--time', '-t', type=float, default=100,
+		help = "Number of seconds simulated (default 100).")
+	parser.add_argument('--method', type=str, default='scipy',
+		help = '''Sepcify either 'rk4' to use a fourth-order Runge-Kutta
+		method or 'scipy' to use odeint in scipy (default).''')
+	parser.add_argument('--no_header', dest='header', action='store_false',
+		help = '''Prints header if this is specified (default False)''')
+	
 	#System Parameters
-	parser.add_argument('--mu', '-u', type=float, default = 0,
+	parser.add_argument('-mu', type=float, default = 0,
 		help='Damping parameter (defaults to 0)')
 	parser.add_argument('-e', type=float, default = 1.13,
 		help='Strength of escapment (defaults 1.13)')
-	parser.add_argument('--gamma', type=float, default = 0.012,
+	parser.add_argument('-gamma', type=float, default = 0.012,
 		help='Critical angle of escapment (default 0.012)')
 	parser.add_argument('-l', type=float, default = 1.0,
 		help='Length of pendulum')
@@ -81,12 +77,22 @@ def parse_arguments():
 		help='Damping parameter for common support')
 	parser.add_argument('-m', type=float, default=0.1,
 		help='Mass of pendulum point mass (default 0.1)')
-	parser.add_argument('--epsilon', type=float, default=0,
+	parser.add_argument('-epsilon', type=float, default=0,
 		help='Strength of driving force (default 0)')
 	parser.add_argument('-g', default=9.81,
 		help='Acceleration of gravity (default 9.81)')
 
-	return parser.parse_args()
+	args = parser.parse_args()
+
+	if(len(args.y0) == 2 and (args.name == 'spring' 
+		or args.name == 'pendulum' or args.name == 'clock')):
+		return args
+	elif(len(args.y0) == 6 and (args.name == 'coupled_clocks'
+		or args.name == 'coupled_driven_clocks')):
+		return args
+	else:
+		args.y0 = [0,0,1.3,0,1.1,0]
+		return args
 
 def set_dydt(name, mu = 7, e = 1.13, gamma = 0.12, l = 1.0, M = 5, k = 0.1, 
 			c=1, m = 0.1, epsilon = 0, g = 9.81):
@@ -113,7 +119,7 @@ def set_dydt(name, mu = 7, e = 1.13, gamma = 0.12, l = 1.0, M = 5, k = 0.1,
 					+ epsilon*cos(t)]
 
 	#X[i] 0=theta1,1=theta1v,2=theta2,3=theta2v,4=x,5=v
-	if(name == 'cd'): 
+	if(name == 'coupled_clocks'): 
 		def D(t,theta, thetav):
 			return e*(gamma**2 - theta**2)*thetav
 
@@ -153,11 +159,10 @@ def print_header(name):
 	"""
 	"""
 
-	if(name == 'spring'): print('Time, Position, Velocity')
-	if(name == 'pendulum' or name == 'clock'): 
-		print('Time, Angle, Angular Velocity')
-	if(name == 'coupled_clocks' or name =='coupled_driven_clocks'): 
-		print('Time, Theta1, Theta1v, Theta2, Theta2v, Beam, BeamV')
+	if(name == 'spring' or name == 'pendulum' or name == 'clock'): 
+		print('Time,Position,Velocity')
+	elif(name == 'coupled_clocks' or name =='coupled_driven_clocks'): 
+		print('Time,Theta1,Theta1v,Theta2,Theta2v,Beam,BeamV')
 
 def solve_ODE(dydt, y0, time = 100.0, dt = 0.05, method = 'scipy'):
 	"""
