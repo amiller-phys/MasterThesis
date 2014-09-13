@@ -24,22 +24,16 @@ To check it, just add /usr/bin/ to front of python2.7 in shebang line.
 
 * Investigate other ODE methods (i.e. non-uniform time-step).
 
+* dt isn't set quite right (numpy thingy).  Works when t and dt divide, but not
+otherwise.
+
+* Make scipy method stream solutions (and not store thme).  Is that possible?
+
+* Add doc strings to individual dydt functions?
+
 ===================================================================
 
 ## Transform Program:
-
-### Input
-CSV File (time series) from stdin.  Does the following transformations:
-* Sum/diff of given vars
-* Poincare Sections (subset data)
-* Limit cycle
-
-### Output
-CSV file, to stdout, ready for plotting.
-
-### Notes:
-* PS and LC just subset the data (horizontal slices).
-* Sum/Diff require more work, to manage the approriate columns.
 
 For poincare, must make sure that t % args.time == 0 (pick step size and time well, otherwise you'll get nothing (or little by chance)).  Check cut off.  ATTEN - Let user specifiy threshold cutt off????
 
@@ -49,9 +43,11 @@ For poincare, must make sure that t % args.time == 0 (pick step size and time we
 
 ### Notes:
 
-* Figure out how to connect the dots
+* Figure out how to connect the dots (using my style).  Post to stack overflow?
 * Possible to do multiple phase portrate plots?
-
+* Add option to do axis limits all at once. Mutually exclusive group?
+* Image size parameters? (need for pdf?)
+* Better way to cast split list into floats? (better than a list comprehension)
 ===================================================================
 
 ## MultiSims Program:
@@ -59,7 +55,6 @@ For poincare, must make sure that t % args.time == 0 (pick step size and time we
 ### Program Notes:
 
 * Creates multiple plots (i.e. Phase Portraits) on the same graph (useful for creating multiple pendulum, spring phase portraits).
-* This was *not* used to create time-series for the coupled clocks, as that was part of one simulation.
 
 
 =====================================================================
@@ -85,3 +80,9 @@ Creates bifurcation diagram, varying one parameter.
 ===================================================================
 
 ## Makefile
+
+===================================================================
+
+## Other Notes
+
+Flush out documentation as needed (i.e. explain color options).
