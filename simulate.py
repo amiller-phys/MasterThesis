@@ -1,25 +1,25 @@
 #!/usr/bin/env python2.7
 
 """
-Program Doc String
+simulate.py use numerical methods to simulate a spring, pendulum, clock,
+coupled clocks, and coupled driven clocks.  The positional argument specifies
+the name of the system.  Initial conditions are set with --y0.  Additional
+simulation parameters can be specified (all with reasonable defaults, see 
+below).  Results are printed in csv format to stdou.  The first line of the
+output is a header.
 """
 
 from __future__ import print_function, division
 import sys, numpy, argparse
-from math import sin,cos, pi
+from math import sin, cos, pi
 from scipy.integrate import odeint
 from itertools import izip
-
-#ATTEN - Give doc strings to individual dydt functs?
-#ATTEN - Make scipy stream solutions?  Possible?
-
-#ATTEN - dt isn't set quite right (numpy thingy).  Works when t and dt divide.
 
 def main():
 	"""
 	Prases options from the command line, sets the derivative function dydt
 	for the system secified in the command line, and then solves the ODE.
-	Results are printed to stdout in csv format.
+	First a header is printed, then results are printed to stdout in csv format.
 	"""
 
 	args = parse_arguments()
@@ -30,7 +30,7 @@ def main():
 
 	print_header(name = args.name)
 
-	solve_ODE(dydt = dydt, time = args.time, dt = args.dt, y0 = args.y0, 
+	solve_ODEs(dydt = dydt, time = args.time, dt = args.dt, y0 = args.y0, 
 		method = args.method)
 
 
@@ -116,7 +116,7 @@ def set_dydt(name, mu = 7, e = 1.13, gamma = 0.12, l = 1.0, M = 5, k = 0.1,
 			return [x[1], -sin(x[0]) - mu*x[1] + e*(gamma**2 - x[0]**2)*x[1]
 					+ epsilon*cos(t)]
 
-	#X[i] 0=theta1,1=theta1v,2=theta2,3=theta2v,4=x,5=v
+	#Next two functions define escapments.
 	if(name == 'coupled_clocks'): 
 		def D(t,theta, thetav):
 			return e*(gamma**2 - theta**2)*thetav
@@ -125,6 +125,7 @@ def set_dydt(name, mu = 7, e = 1.13, gamma = 0.12, l = 1.0, M = 5, k = 0.1,
 		def D(t,theta, thetav):
 			return epsilon*cos(t) - mu*thetav
 
+	#X[i] 0=theta1,1=theta1v,2=theta2,3=theta2v,4=beam,5=beamv
 	if(name == 'coupled_clocks' or name == 'coupled_driven_clocks'):
 		def xa(x,t):
 			EscTerm = D(t,x[0],x[1])*cos(x[0])/l + D(t,x[2],x[3])*cos(x[2])/l
@@ -155,14 +156,17 @@ def set_dydt(name, mu = 7, e = 1.13, gamma = 0.12, l = 1.0, M = 5, k = 0.1,
 
 def print_header(name):
 	"""
+	Pre-condition: name is either 'spring', 'pendulum', 'clock', 'coupled_clocks',
+	or 'coupled_driven_clocks'.
+	Post-condition: Prints approriate column headers to stdout.
 	"""
 
 	if(name == 'spring' or name == 'pendulum' or name == 'clock'): 
-		print('Time,Position,Velocity')
+		print('time,position,velocity')
 	elif(name == 'coupled_clocks' or name =='coupled_driven_clocks'): 
-		print('Time,Theta1,Theta1v,Theta2,Theta2v,Beam,BeamV')
+		print('time,theta1,theta1v,theta2,theta2v,beam,beam_v')
 
-def solve_ODE(dydt, y0, time = 100.0, dt = 0.05, method = 'scipy'):
+def solve_ODEs(dydt, y0, time = 100.0, dt = 0.05, method = 'scipy'):
 	"""
 	Pre-condiiton: dydt is a function, dydt(x,t), where x is a list of length n
 	and t is time (n is the number of degrees of freedom).
