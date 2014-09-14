@@ -1,14 +1,14 @@
 This is a list of the programs for my masters thesis, and what they intend to accomplish.
 
 ## Systems/Plots:
--Spring (SHM) (viewed as Phase Portrain, Time Series)
-	-Damped Spring (DON'T MAKE SEPARATE THAN NON-DAMPPED)
--Pendulum
--Clock (also limit cycle)
--Driven pendulum (also Poincare section)
--Driven pendulum Bifurcation Diagram (needs own since varing Forcing Amp, freq, damping )
--Coupled clocks (time series, sum/diff angle)
--Driven coupled clocks (phase portraits, limit cycle, biffurcation)
+
+* Spring (SHM) (viewed as Phase Portrain, Time Series). Damped Spring (DON'T MAKE SEPARATE THAN NON-DAMPPED)
+* Pendulum
+* Clock (also limit cycle)
+* Driven pendulum (also Poincare section)
+* Driven pendulum Bifurcation Diagram (needs own since varing Forcing Amp, freq, damping )
+* Coupled clocks (time series, sum/diff angle)
+* Driven coupled clocks (phase portraits, limit cycle, biffurcation)
 
 ===================================================================
 
@@ -35,7 +35,7 @@ otherwise.
 
 ## Transform Program:
 
-For poincare, must make sure that t % args.time == 0 (pick step size and time well, otherwise you'll get nothing (or little by chance)).  Check cut off.  ATTEN - Let user specifiy threshold cutt off????
+For poincare, must make sure that t % args.time == 0 (pick step size and time well, otherwise you'll get nothing (or little by chance)).  Check cut off.  Let user specifiy threshold cutt off????
 
 ===================================================================
 
