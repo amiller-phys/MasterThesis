@@ -48,6 +48,7 @@ For poincare, must make sure that t % args.time == 0 (pick step size and time we
 * Add option to do axis limits all at once. Mutually exclusive group?
 * Image size parameters? (need for pdf?)
 * Better way to cast split list into floats? (better than a list comprehension)
+
 ===================================================================
 
 ## MultiSims Program:
